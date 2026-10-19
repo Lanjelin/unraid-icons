@@ -1,0 +1,348 @@
+.ui-icons {
+  --ui-icons-bg: var(--background-color, #fff);
+  --ui-icons-text: var(--text-color, #222);
+  --ui-icons-border: var(--border-color, #888);
+  --ui-icons-muted-bg: var(--mild-background-color, #eee);
+  color: var(--ui-icons-text);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.ui-icons,
+.ui-icons *,
+.ui-icons *::before,
+.ui-icons *::after {
+  box-sizing: border-box;
+}
+
+.ui-icons [hidden] {
+  display: none !important;
+}
+
+.ui-icons h2 {
+  margin: 0 0 12px;
+  color: inherit;
+  font-size: 21px;
+  line-height: 1.3;
+}
+
+.ui-icons p {
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+
+.ui-icons code {
+  overflow-wrap: anywhere;
+}
+
+.ui-icons button {
+  margin: 0;
+}
+
+
+.ui-icons input:focus-visible,
+.ui-icons a:focus-visible,
+.ui-icons select:focus-visible {
+  outline: 3px solid #e86d24;
+  outline-offset: 3px;
+}
+
+.ui-icons input[type="search"],
+.ui-icons input[type="url"],
+.ui-icons input[type="text"] {
+  display: inline-block;
+  min-height: 38px;
+  max-width: 100%;
+  margin: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--input-border-color, var(--ui-icons-border));
+  border-radius: 4px;
+  background: var(--ui-icons-bg);
+  color: var(--ui-icons-text);
+  font: inherit;
+  line-height: 1.4;
+  text-indent: 0;
+}
+
+.ui-icons-toolbar,
+.ui-icons-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.ui-icons-toolbar input,
+.ui-icons-search input {
+  flex: 1 1 220px;
+}
+
+.ui-icons-toolbar label,
+.ui-icons-search label {
+  margin: 0;
+}
+
+.ui-icons-iconify-controls input[type="color"] {
+  flex: 0 0 48px;
+  width: 48px;
+  min-height: 36px;
+  margin: 0;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.ui-icons-attribution,
+.ui-icons-collection {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.ui-icons-card .ui-icons-collection {
+  margin: 0;
+  text-align: center;
+}
+
+.ui-icons-credits {
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ui-icons-border);
+}
+
+.ui-icons-credits h3 {
+  margin: 0;
+  color: inherit;
+  font-size: 15px;
+}
+
+.ui-icons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.ui-icons-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--ui-icons-border);
+  border-radius: 6px;
+  background: var(--ui-icons-bg);
+}
+
+.ui-icons-card .ui-icons-name {
+  margin: 0;
+  color: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.ui-icons-card > button {
+  margin-top: auto;
+}
+
+.ui-icons-thumbnail {
+  display: flex;
+  width: 100%;
+  height: 88px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 4px;
+  background: var(--ui-icons-muted-bg);
+}
+
+.ui-icons-thumbnail img {
+  display: block;
+  width: 72px;
+  height: 72px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.ui-icons-image-error {
+  font-size: 12px;
+  text-align: center;
+}
+
+.ui-icons-card .ui-icons-usage {
+  margin: 0 0 4px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.ui-icons-empty {
+  grid-column: 1 / -1;
+}
+
+.ui-icons-status:empty,
+.ui-icons-error:empty {
+  display: none;
+}
+
+.ui-icons-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+.ui-icons .ui-icons-error {
+  padding: 10px 12px;
+  border: 2px solid #d54b3f;
+  border-radius: 4px;
+  color: inherit;
+  font-weight: 600;
+}
+
+.ui-icons-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(1000px, calc(100vw - 32px));
+  height: auto;
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 24px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--ui-icons-border);
+  border-radius: 8px;
+  background: var(--ui-icons-bg);
+  color: var(--ui-icons-text);
+  box-shadow: 0 14px 60px rgb(0 0 0 / 40%);
+}
+
+.ui-icons-dialog::backdrop {
+  background: rgb(0 0 0 / 65%);
+}
+
+.ui-icons-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.ui-icons-dialog-header h2 {
+  margin: 3px 0 0;
+}
+
+.ui-icons-close {
+  flex: 0 0 auto;
+}
+
+.ui-icons-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 18px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ui-icons-border);
+}
+
+
+.ui-icons-panel {
+  padding: 0;
+  margin: 0;
+}
+
+.ui-icons-help {
+  font-size: 13px;
+}
+
+.ui-icons-result {
+  margin: 12px 0;
+  padding: 12px;
+  border: 2px solid #e86d24;
+  border-radius: 6px;
+}
+
+.ui-icons-result .ui-icons-card {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 0;
+  border: none;
+}
+
+.ui-icons-result .ui-icons-name {
+  text-align: left;
+}
+
+.ui-icons-result .ui-icons-card > button {
+  margin: 0;
+}
+
+.ui-icons-url-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  max-width: 680px;
+}
+
+.ui-icons-url-form label {
+  font-weight: 600;
+}
+
+.ui-icons-url-form button {
+  align-self: flex-start;
+  margin-top: 10px;
+}
+
+.ui-icons-editor {
+  display: inline-flex;
+  max-width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 4px 10px;
+  vertical-align: middle;
+}
+
+.ui-icons-editor-status {
+  display: block;
+  flex-basis: 100%;
+  max-width: 440px;
+  font-size: 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 540px) {
+  .ui-icons-dialog {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 16px;
+  }
+
+  .ui-icons-grid {
+    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+    gap: 10px;
+  }
+
+  .ui-icons-toolbar label,
+  .ui-icons-search label {
+    flex-basis: 100%;
+  }
+
+  .ui-icons-result .ui-icons-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .ui-icons-result .ui-icons-card > button {
+    grid-column: 1 / -1;
+  }
+}

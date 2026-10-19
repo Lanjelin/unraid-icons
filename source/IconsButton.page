@@ -1,0 +1,57 @@
+Menu="Buttons:80"
+Title="Icons"
+Icon="fa-picture-o"
+Link="unraid-icons-link"
+---
+<?php
+require_once $docroot.'/plugins/unraid-icons/include/Icons.php';
+$unraidIconsHeader = false;
+try {
+  $unraidIconsHeader = (new \UnraidIcons\Icons())->preferences()['headerShortcut'];
+} catch (\Throwable $error) {
+  error_log('unraid-icons: '.$error->getMessage());
+}
+?>
+<style>.unraid-icons-link:empty { display: none; }</style>
+<script>
+(function () {
+  'use strict';
+  function renderShortcut(enabled) {
+    document.querySelectorAll('div.unraid-icons-link').forEach(function (slot) {
+      slot.hidden = !enabled;
+      if (!enabled) { slot.replaceChildren(); return; }
+      slot.classList.add('nav-item', 'IconsButton', 'util');
+      var link = document.createElement('a');
+      link.href = '/Settings/Icons';
+      link.title = 'VM and Docker icons';
+      var icon = document.createElement('b');
+      icon.className = 'fa fa-picture-o system';
+      icon.setAttribute('aria-hidden', 'true');
+      var label = document.createElement('span');
+      label.textContent = 'Icons';
+      link.append(icon, label);
+      slot.replaceChildren(link);
+    });
+  }
+  document.addEventListener('unraid-icons-preferences', function (event) {
+    renderShortcut(event.detail.headerShortcut === true);
+  });
+  function ready() {
+    renderShortcut(<?=json_encode($unraidIconsHeader)?>);
+    var path = window.location.pathname;
+    var editor = /\/(?:AddVM|UpdateVM|AddContainer|UpdateContainer)(?:\/|$)/.test(path);
+    if (!editor && !document.querySelector('#unraid-icons-settings, #template_icon, input[name="contIcon"]')) return;
+    if (document.getElementById('unraid-icons-script')) return;
+    var css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = '<?php autov('/plugins/unraid-icons/styles/icons.css'); ?>';
+    document.head.appendChild(css);
+    var script = document.createElement('script');
+    script.id = 'unraid-icons-script';
+    script.src = '<?php autov('/plugins/unraid-icons/javascript/icons.js'); ?>';
+    document.head.appendChild(script);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready, {once: true});
+  else ready();
+}());
+</script>

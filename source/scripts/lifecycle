@@ -1,0 +1,30 @@
+#!/bin/bash
+set -euo pipefail
+
+plugin=/usr/local/emhttp/plugins/unraid-icons
+vm_images=/usr/local/emhttp/plugins/dynamix.vm.manager/templates/images
+
+case "${1:-}" in
+  install)
+    php -r 'foreach (["curl", "gd", "dom", "simplexml"] as $extension) { if (!extension_loaded($extension)) { fwrite(STDERR, "unraid-icons requires PHP extension: $extension\n"); exit(1); } }'
+    mkdir -p /boot/config/plugins/unraid-icons/icons
+    php "$plugin/scripts/restore.php"
+    ;;
+  remove)
+    # Only remove our own runtime links. Persistent icons and metadata are retained.
+    if [[ -d "$vm_images" ]]; then
+      for link in "$vm_images"/*.png; do
+        [[ -L "$link" ]] || continue
+        target=$(readlink "$link")
+        if [[ "$target" == "/boot/config/plugins/unraid-icons/icons/${link##*/}" ]]; then
+          rm -- "$link"
+        fi
+      done
+    fi
+    rm -rf -- "$plugin"
+    ;;
+  *)
+    echo 'Usage: lifecycle install|remove' >&2
+    exit 2
+    ;;
+esac

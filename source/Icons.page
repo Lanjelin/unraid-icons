@@ -1,0 +1,32 @@
+Menu="UserPreferences"
+Title="Icons"
+Icon="fa-picture-o"
+Tag="picture-o"
+Type="xmenu"
+Tabs="true"
+Markdown="false"
+---
+<section id="unraid-icons-settings" class="ui-icons" aria-labelledby="unraid-icons-heading">
+  <h2 id="unraid-icons-heading">VM and Docker icons</h2>
+  <p>Downloaded icons are available to use for both Docker and VMs.</p>
+  <p>Persistent storage: <code>/boot/config/plugins/unraid-icons/icons</code>.</p>
+  <div class="ui-icons-toolbar">
+    <label><input type="checkbox" id="unraid-icons-header-shortcut" disabled> Show shortcut in header</label>
+    <span id="unraid-icons-preferences-status" role="status" aria-live="polite"></span>
+  </div>
+  <div class="ui-icons-toolbar">
+    <button type="button" id="unraid-icons-add">Add icon</button>
+    <button type="button" id="unraid-icons-refresh">Refresh library</button>
+    <label for="unraid-icons-filter">Search library</label>
+    <input type="search" id="unraid-icons-filter" placeholder="Search saved icons" autocomplete="off">
+  </div>
+  <p id="unraid-icons-settings-status" class="ui-icons-status" role="status" aria-live="polite"></p>
+  <p id="unraid-icons-settings-error" class="ui-icons-error" role="alert" hidden></p>
+  <p>Only icons confirmed unused by both VMs and Docker can be removed. Stop/start state does not make an icon unused.</p>
+  <div id="unraid-icons-library" class="ui-icons-grid" aria-label="Saved icons" aria-busy="true"></div>
+  <footer id="unraid-icons-credits" class="ui-icons-credits" aria-labelledby="unraid-icons-credits-heading" hidden>
+    <h3 id="unraid-icons-credits-heading">Sources &amp; licenses</h3>
+    <div id="unraid-icons-credit-list"></div>
+  </footer>
+  <noscript>JavaScript must be enabled to load the icon library and picker.</noscript>
+</section>
