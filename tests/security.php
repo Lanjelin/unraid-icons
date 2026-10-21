@@ -53,6 +53,37 @@ try {
     if (!is_file($paths['icons'] . '/' . $filename)) throw new RuntimeException('Refused deletion removed the icon');
     if (!is_link($paths['vmImages'] . '/' . $filename)) throw new RuntimeException('VM icon not published');
     $checks += 3;
+    // Manual PNG data URLs use the same normalization and publication path as downloads.
+    $record = $icons->download('data:image/png;base64,'.base64_encode($png), 'Inline icon');
+    $saved = $paths['icons'].'/'.$record['filename'];
+    $decoded = imagecreatefrompng($saved);
+    if ($record['name'] !== 'Inline icon' || imagesx($decoded) !== 2 || imagesy($decoded) !== 2 ||
+        imagecolorat($decoded, 0, 0) !== 0) {
+        throw new RuntimeException('Inline PNG was not saved with its name and pixels');
+    }
+    imagedestroy($decoded);
+    if (!is_link($paths['runtime'].'/'.$record['filename']) ||
+        !is_link($paths['vmImages'].'/'.$record['filename']) ||
+        $record['source'] !== 'data:image/png') {
+        throw new RuntimeException('Inline PNG was not published with bounded metadata');
+    }
+    $unnamed = $icons->download('DATA:IMAGE/PNG;BASE64,'.base64_encode($png));
+    if ($unnamed['name'] !== 'Custom icon') throw new RuntimeException('Inline PNG needs a readable default name');
+    $checks += 3;
+    foreach ([
+        'data:image/png;base64,',
+        'data:image/png;base64,not!base64',
+        'data:image/png;base64,'.base64_encode('<svg xmlns="http://www.w3.org/2000/svg"/>'),
+        'data:image/png,'.rawurlencode($png),
+        'data:image/svg+xml;base64,'.base64_encode('<svg/>'),
+    ] as $url) {
+        expectFailure(fn() => $icons->download($url), 'invalid PNG data URL');
+    }
+    expectFailure(fn() => $icons->download('data:image/png;base64,'.str_repeat('A', 11184813)), 'encoded PNG limit', 413);
+    expectFailure(fn() => $icons->download('data:image/png;base64,'.base64_encode("\x89PNG\r\n\x1a\n".str_repeat("\0", 8388601))), 'decoded PNG limit', 413);
+    $large = imagecreatetruecolor(4097, 1);
+    ob_start(); imagepng($large); $largePng = ob_get_clean(); imagedestroy($large);
+    expectFailure(fn() => $icons->download('data:image/png;base64,'.base64_encode($largePng)), 'inline PNG dimensions');
     echo "Passed $checks security and persistence checks.\n";
 } finally {
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);

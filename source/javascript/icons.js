@@ -592,7 +592,7 @@
   Picker.prototype.createURLForm = function () {
     var self = this;
     var form = node('form', 'ui-icons-url-form');
-    var help = node('p', '', 'Enter a public HTTP or HTTPS image URL. PNG, JPEG, WebP and GIF are supported when available on your server, and converted to PNG. SVG is not supported. Private network addresses are blocked.');
+    var help = node('p', '', 'Enter a public HTTP or HTTPS image URL, or paste a data:image/png;base64,... URL. PNG, JPEG, WebP and GIF are supported for public URLs when available on your server, and converted to PNG. Data URLs must contain a PNG. SVG is not supported. Private network addresses are blocked.');
     var urlLabel = node('label', '', 'Image URL');
     urlLabel.htmlFor = 'unraid-icons-url';
     this.urlInput = node('input');

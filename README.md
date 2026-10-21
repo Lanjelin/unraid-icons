@@ -50,10 +50,11 @@ Iconify icons are converted automatically in your browser into transparent 512 Ã
 
 ### Import a custom image
 
-Open **Custom URL**, enter a direct public image URL, optionally give it a name, and select **Download icon**. The URL must point to the image itself, not a webpage containing it.
+Open **Custom URL**, enter a direct public image URL or paste a `data:image/png;base64,...` URL, optionally give it a name, and select **Download icon**. Public URLs must point to the image itself, not a webpage containing it.
 
-- Supported formats: PNG, JPEG, GIF, and WebP, subject to your server's image-format support. All are saved as PNG; animated images become a single frame.
-- Maximum download size: **8 MiB**. Images must be no larger than **4096 pixels on either side** and **4,194,304 pixels in total**.
+- Supported formats: PNG, JPEG, GIF, and WebP for public URLs, subject to your server's image-format support. Data URLs support base64-encoded PNG only. All are saved as PNG; animated images become a single frame.
+- Maximum image size: **8 MiB**, measured after base64 decoding for data URLs. Images must be no larger than **4096 pixels on either side** and **4,194,304 pixels in total**. Encoded data URLs must also fit PHP and web-server request-size limits.
+- Data URLs are imported without an external download. Their base64 payload is not retained in library metadata; unnamed imports use **Custom icon**.
 - Custom SVG URLs are not supported. Use a PNG version or one of the supported Iconify collections instead.
 - Local/private network URLs and URLs with embedded login credentials are rejected. The plugin does not import images from private services on your LAN.
 
@@ -138,3 +139,15 @@ Uninstalling removes the plugin interface and its runtime links, but **keeps dow
 VM icons supplied by the plugin may fall back to Unraid's default after removal because their runtime links are gone. Existing Docker icon caches are not deleted, so a container may continue to show its cached icon; that does not mean the plugin is still installed.
 
 For a complete cleanup, manually remove `/boot/config/plugins/unraid-icons` only after uninstalling, reassigning all references, and confirming you no longer need the downloads or settings. Deleting that directory permanently removes the retained library.
+
+## Build a release
+
+Requires Node.js and GNU `tar`. Run from the repository root:
+
+```bash
+node tools/build.mjs
+```
+
+The build creates the self-contained `dist/unraid-icons.plg`. Before each release, update `version` in `tools/build.mjs` and add a matching version heading at the top of [CHANGELOG.md](CHANGELOG.md), with concise user-facing changes. Keep older entries below it.
+
+The builder embeds the changelog in the plugin's `<CHANGES>` element so Unraid's plugin manager can display release notes. Do not edit the generated `.plg` by hand. Publish the rebuilt `dist/unraid-icons.plg` at the configured update URL.

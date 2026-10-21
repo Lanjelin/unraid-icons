@@ -266,9 +266,25 @@ final class Icons
     public function download(string $url, string $name = ''): array
     {
         // Network and decoding run outside the CRUD lock; no library state changes yet.
-        $png = $this->normalize($this->fetch($url));
+        if (strncasecmp($url, 'data:image/png;base64,', 22) === 0) {
+            if (strlen($url) - 22 > 4 * (int) ceil(self::MAX_BYTES / 3)) {
+                throw new \RuntimeException('The encoded PNG exceeds the 8 MiB image limit.', 413);
+            }
+            $bytes = base64_decode(substr($url, 22), true);
+            if ($bytes === false || substr($bytes, 0, 8) !== "\x89PNG\r\n\x1a\n") {
+                throw new \RuntimeException('Enter a valid base64-encoded PNG data URL.', 400);
+            }
+            if (strlen($bytes) > self::MAX_BYTES) {
+                throw new \RuntimeException('The PNG exceeds the 8 MiB image limit.', 413);
+            }
+            $png = $this->normalize($bytes);
+            // Keep image payloads out of bounded library metadata and API responses.
+            $url = 'data:image/png';
+        } else {
+            $png = $this->normalize($this->fetch($url));
+        }
         $name = trim($name);
-        if ($name === '') {
+        if ($name === '' && $url !== 'data:image/png') {
             $name = pathinfo(rawurldecode((string) parse_url($url, PHP_URL_PATH)), PATHINFO_FILENAME);
         }
         $name = preg_replace('/[\x00-\x1f\x7f]/u', '', $name) ?? '';
