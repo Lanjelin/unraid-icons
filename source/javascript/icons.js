@@ -411,13 +411,13 @@
     }
   }
 
-  function applyIcon(target, record, composePng) {
+  function applyIcon(target, record, embeddedPng) {
     if (!target || !target.input.isConnected) throw new Error('The editor is no longer available. The icon is saved in the library; reopen the editor to select it.');
-    target.input.value = target.type === 'compose' ? composePng : (target.type === 'vm' ? record.vmIcon : record.dockerIcon);
+    target.input.value = target.embedded ? embeddedPng : (target.type === 'vm' ? record.vmIcon : record.dockerIcon);
     target.input.dispatchEvent(new Event('input', {bubbles: true}));
     target.input.dispatchEvent(new Event('change', {bubbles: true}));
     // Core Docker listeners try to preview file:// directly. Set HTTP preview last.
-    var preview = target.type === 'compose' ? null : document.getElementById(target.type === 'vm' ? 'template_img' : 'contIconPreview');
+    var preview = target.embedded ? null : document.getElementById(target.type === 'vm' ? 'template_img' : 'contIconPreview');
     if (preview) {
       preview.src = record.url;
       preview.style.display = '';
@@ -678,16 +678,16 @@
     this.choosing = true;
     var target = this.target;
     try {
-      var composePng;
-      if (target && target.type === 'compose') {
-        // Compose rejects plugin-relative stack URLs and cannot proxy authenticated/private hosts.
-        // Its native data-image support stores a copy without either dependency.
+      var embeddedPng;
+      if (target && target.embedded) {
+        // Optional integrations store independent PNG copies, avoiding authenticated URL
+        // dependencies and references that their saved configuration cannot protect.
         var response = await fetch(record.url, {credentials: 'same-origin'});
         if (!response.ok) throw new Error('Unable to read the saved PNG. Refresh the library and try again.');
-        composePng = 'data:image/png;base64,' + await encodedPng(await response.blob());
+        embeddedPng = 'data:image/png;base64,' + await encodedPng(await response.blob());
         if (!this.dialog.open || this.target !== target) return;
       }
-      if (target) applyIcon(target, record, composePng);
+      if (target) applyIcon(target, record, embeddedPng);
       else if (settings) settings.notify('“' + record.name + '” is saved in your library and available in supported editors.', false);
       this.dialog.close();
     } catch (error) {
@@ -1080,16 +1080,16 @@
   function attach(input, type) {
     if (input.dataset.unraidIconsAttached === 'true') return;
     input.dataset.unraidIconsAttached = 'true';
-    var group = node('span', 'ui-icons ui-icons-editor');
+    var group = node('span', 'ui-icons ui-icons-editor' + (type === 'folderview' ? ' ui-icons-folderview-editor' : ''));
     var feedback = node('span', 'ui-icons-editor-status');
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
     feedback.hidden = true;
-    var target = {input: input, type: type, feedback: feedback};
+    var target = {input: input, type: type, feedback: feedback, embedded: type === 'compose' || type === 'folderview'};
     var choose = button('Choose icon…', function () { openPicker(target, choose); });
     choose.title = 'Choose a shared library icon';
     group.append(choose, feedback);
-    var preview = type === 'compose' ? null : document.getElementById(type === 'vm' ? 'template_img' : 'contIconPreview');
+    var preview = target.embedded ? null : document.getElementById(type === 'vm' ? 'template_img' : 'contIconPreview');
     (preview || input).insertAdjacentElement('afterend', group);
     if (type === 'vm') {
       loadLibrary().catch(function (error) { notify(target, errorText(error), true); });
@@ -1116,6 +1116,11 @@
     document.querySelectorAll('#editor-modal-overlay #settings-icon-url, #labels-services-container input[data-service][data-field="icon"]').forEach(function (input) {
       if (!input.readOnly && !input.disabled) attach(input, 'compose');
     });
+    if (document.querySelector('script[src*="/plugins/folder.view3/scripts/folder.js"]')) {
+      document.querySelectorAll('div.canvas > form input[name="icon"]').forEach(function (input) {
+        if (!input.readOnly && !input.disabled) attach(input, 'folderview');
+      });
+    }
   }
 
   function init() {
@@ -1125,7 +1130,7 @@
       settings.load();
     }
     attachEditors();
-    // VM template switches and Compose service tabs may replace fields without navigating.
+    // Editors may replace icon fields without navigating.
     var pending = false;
     new MutationObserver(function (mutations) {
       if (pending || !mutations.some(function (entry) { return entry.addedNodes.length > 0; })) return;

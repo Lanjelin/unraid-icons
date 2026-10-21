@@ -1,6 +1,6 @@
 # unraid-icons
 
-A shared icon library for Unraid VMs and Docker containers, with optional Compose Manager Plus integration. Browse application logos and generic symbols, or import an image from a URL. Download an icon once and select it from supported editors.
+A shared icon library for Unraid VMs and Docker containers, with optional Compose Manager Plus and FolderView3 integrations. Browse application logos and generic symbols, or import an image from a URL. Download an icon once and select it from supported editors.
 
 [GitHub repository](https://github.com/lanjelin/unraid-icons) · [Report an issue](https://github.com/lanjelin/unraid-icons/issues)
 
@@ -83,6 +83,16 @@ Choose a saved icon or download one, then select **Use icon** and use Compose Ma
 Selections are embedded as PNG data URLs in Compose's settings or service labels, not linked to the library file. This avoids private-host and authenticated-URL restrictions. Saved copies remain usable if you delete the library original or uninstall unraid-icons, and do not count as library-file references. Changing an icon in the library does not update those copies; select it again to replace them. Large embedded images must fit Compose Manager Plus and web-server request-size limits.
 
 Compose Manager Plus is not required. Without it, the normal VM and Docker integrations work unchanged.
+
+### FolderView3 (optional)
+
+If [FolderView3](https://github.com/chodeus/folder.view3) is installed, **Choose icon…** appears beside **Icon** when adding or editing a Docker or VM folder.
+
+Choose a saved icon or download one, select **Use icon**, then use FolderView3's **Apply** button to save the folder. The folder preview updates immediately; canceling the editor leaves the saved folder unchanged.
+
+Folder icons are saved as independent PNG data URLs in FolderView3's configuration. They remain usable if you delete the library original or uninstall unraid-icons, and do not count as library-file references. Select an icon again to replace a saved copy. Large embedded images must fit PHP and web-server request-size limits and FolderView3's backup/import limits.
+
+FolderView3 is not required. The integration only attaches to its folder editor and leaves unrelated icon fields unchanged.
 
 ## Manage your library
 

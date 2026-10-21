@@ -312,6 +312,11 @@
   vertical-align: middle;
 }
 
+.ui-icons-folderview-editor {
+  flex-basis: 100%;
+  margin-left: 0;
+}
+
 .ui-icons-editor-status {
   display: block;
   flex-basis: 100%;
