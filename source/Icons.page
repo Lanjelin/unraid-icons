@@ -8,7 +8,7 @@ Markdown="false"
 ---
 <section id="unraid-icons-settings" class="ui-icons" aria-labelledby="unraid-icons-heading">
   <h2 id="unraid-icons-heading">VM and Docker icons</h2>
-  <p>Downloaded icons are available to use for both Docker and VMs.</p>
+  <p>Downloaded icons are available to use for Docker, VMs, and Compose Manager Plus when installed.</p>
   <p>Persistent storage: <code>/boot/config/plugins/unraid-icons/icons</code>.</p>
   <div class="ui-icons-toolbar">
     <label><input type="checkbox" id="unraid-icons-header-shortcut" disabled> Show shortcut in header</label>

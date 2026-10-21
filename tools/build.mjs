@@ -5,14 +5,16 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const version = '2026.10.21';
+const changelog = await readFile(path.join(root, 'CHANGELOG.md'), 'utf8');
+const release = changelog.trimStart().match(/^### (\d{4}\.\d{2}\.\d{2}[a-z]?)[ \t]*(?:\r?\n|$)/);
+if (!release) throw new Error('CHANGELOG.md must start with a release heading: ### YYYY.MM.DD (optional lowercase letter suffix).');
+const version = release[1];
 const repository = 'https://github.com/lanjelin/unraid-icons';
 const pluginURL = 'https://raw.githubusercontent.com/lanjelin/unraid-icons/main/dist/unraid-icons.plg';
 const result = spawnSync('tar', ['--sort=name', '--mtime=2026-10-19T00:00:00Z', '--owner=0', '--group=0', '--numeric-owner', '-czf', '-', '-C', path.join(root, 'source'), '.', '-C', root, '--transform=s,^README.md$,README-full.md,', 'README.md', 'LICENSE'], { maxBuffer: 16 * 1024 * 1024 });
 if (result.status !== 0) throw new Error(result.stderr.toString());
 const payload = result.stdout.toString('base64').match(/.{1,76}/g).join('\n');
 const lifecycle = await readFile(path.join(root, 'source/scripts/lifecycle'), 'utf8');
-const changelog = await readFile(path.join(root, 'CHANGELOG.md'), 'utf8');
 const install = `#!/bin/bash
 set -euo pipefail
 trap 'rm -f /tmp/unraid-icons-install.sh /tmp/unraid-icons-payload.tgz' EXIT

@@ -6,6 +6,7 @@ Link="unraid-icons-link"
 <?php
 require_once $docroot.'/plugins/unraid-icons/include/Icons.php';
 $unraidIconsHeader = false;
+$unraidIconsCompose = is_dir($docroot.'/plugins/compose.manager');
 try {
   $unraidIconsHeader = (new \UnraidIcons\Icons())->preferences()['headerShortcut'];
 } catch (\Throwable $error) {
@@ -40,7 +41,8 @@ try {
     renderShortcut(<?=json_encode($unraidIconsHeader)?>);
     var path = window.location.pathname;
     var editor = /\/(?:AddVM|UpdateVM|AddContainer|UpdateContainer)(?:\/|$)/.test(path);
-    if (!editor && !document.querySelector('#unraid-icons-settings, #template_icon, input[name="contIcon"]')) return;
+    var compose = <?=json_encode($unraidIconsCompose)?> && /\/(?:Compose|Docker)(?:\/|$)/.test(path);
+    if (!editor && !compose && !document.querySelector('#unraid-icons-settings, #template_icon, input[name="contIcon"], #editor-modal-overlay #settings-icon-url')) return;
     if (document.getElementById('unraid-icons-script')) return;
     var css = document.createElement('link');
     css.rel = 'stylesheet';

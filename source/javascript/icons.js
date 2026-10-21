@@ -411,13 +411,13 @@
     }
   }
 
-  function applyIcon(target, record) {
+  function applyIcon(target, record, composePng) {
     if (!target || !target.input.isConnected) throw new Error('The editor is no longer available. The icon is saved in the library; reopen the editor to select it.');
-    target.input.value = target.type === 'vm' ? record.vmIcon : record.dockerIcon;
+    target.input.value = target.type === 'compose' ? composePng : (target.type === 'vm' ? record.vmIcon : record.dockerIcon);
     target.input.dispatchEvent(new Event('input', {bubbles: true}));
     target.input.dispatchEvent(new Event('change', {bubbles: true}));
     // Core Docker listeners try to preview file:// directly. Set HTTP preview last.
-    var preview = document.getElementById(target.type === 'vm' ? 'template_img' : 'contIconPreview');
+    var preview = target.type === 'compose' ? null : document.getElementById(target.type === 'vm' ? 'template_img' : 'contIconPreview');
     if (preview) {
       preview.src = record.url;
       preview.style.display = '';
@@ -564,6 +564,14 @@
     this.panels.catalog.append(this.catalogCredit, this.catalogAttribution, this.catalogStatus, this.catalogRetry, this.previewStatus, this.previewRetry, this.catalogGrid);
     this.createURLForm();
     this.dialog.append(header, help, this.tabs, this.status, this.error, this.result, this.panels.local, this.panels.catalog, this.panels.url);
+    this.dialog.addEventListener('keydown', function (event) {
+      if (!self.target || self.target.type !== 'compose') return;
+      // Compose's document shortcuts must not close or save the editor under this dialog.
+      if (event.key === 'Escape' || ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's')) {
+        event.stopPropagation();
+        if (event.key !== 'Escape') event.preventDefault();
+      }
+    });
     this.dialog.addEventListener('close', function () {
       self.clearPreviews();
       self.result.replaceChildren();
@@ -623,7 +631,7 @@
     this.opener = opener;
     this.help.textContent = target
       ? 'Downloads stay in your library even if you close this picker. Choose Use icon, then use the editor’s Apply button to save your change.'
-      : 'Downloads are saved immediately to the shared VM and Docker library. You can select them later from either editor.';
+      : 'Downloads are saved immediately to the shared icon library. You can select them later from any supported editor.';
     if (!this.busy) {
       message(this.status, '');
       message(this.error, '');
@@ -665,13 +673,27 @@
     }
   };
 
-  Picker.prototype.choose = function (record) {
+  Picker.prototype.choose = async function (record) {
+    if (this.choosing) return;
+    this.choosing = true;
+    var target = this.target;
     try {
-      if (this.target) applyIcon(this.target, record);
-      else if (settings) settings.notify('“' + record.name + '” is saved in your library and available in both editors.', false);
+      var composePng;
+      if (target && target.type === 'compose') {
+        // Compose rejects plugin-relative stack URLs and cannot proxy authenticated/private hosts.
+        // Its native data-image support stores a copy without either dependency.
+        var response = await fetch(record.url, {credentials: 'same-origin'});
+        if (!response.ok) throw new Error('Unable to read the saved PNG. Refresh the library and try again.');
+        composePng = 'data:image/png;base64,' + await encodedPng(await response.blob());
+        if (!this.dialog.open || this.target !== target) return;
+      }
+      if (target) applyIcon(target, record, composePng);
+      else if (settings) settings.notify('“' + record.name + '” is saved in your library and available in supported editors.', false);
       this.dialog.close();
     } catch (error) {
       message(this.error, errorText(error));
+    } finally {
+      this.choosing = false;
     }
   };
 
@@ -897,7 +919,7 @@
         this.result.hidden = false;
         result.querySelector('button').focus();
       } else {
-        notify(target, '“' + record.name + '” was saved to the library.' + (target ? ' Open Choose icon to select it, then Apply in the editor.' : ' It is available in both editors.'), false);
+        notify(target, '“' + record.name + '” was saved to the library.' + (target ? ' Open Choose icon to select it, then Apply in the editor.' : ' It is available in supported editors.'), false);
       }
     } catch (error) {
       message(this.status, '');
@@ -1065,9 +1087,9 @@
     feedback.hidden = true;
     var target = {input: input, type: type, feedback: feedback};
     var choose = button('Choose icon…', function () { openPicker(target, choose); });
-    choose.title = 'Choose a shared VM or Docker icon';
+    choose.title = 'Choose a shared library icon';
     group.append(choose, feedback);
-    var preview = document.getElementById(type === 'vm' ? 'template_img' : 'contIconPreview');
+    var preview = type === 'compose' ? null : document.getElementById(type === 'vm' ? 'template_img' : 'contIconPreview');
     (preview || input).insertAdjacentElement('afterend', group);
     if (type === 'vm') {
       loadLibrary().catch(function (error) { notify(target, errorText(error), true); });
@@ -1091,6 +1113,9 @@
   function attachEditors() {
     document.querySelectorAll('#template_icon').forEach(function (input) { attach(input, 'vm'); });
     document.querySelectorAll('input[name="contIcon"]').forEach(function (input) { attach(input, 'docker'); });
+    document.querySelectorAll('#editor-modal-overlay #settings-icon-url, #labels-services-container input[data-service][data-field="icon"]').forEach(function (input) {
+      if (!input.readOnly && !input.disabled) attach(input, 'compose');
+    });
   }
 
   function init() {
@@ -1100,7 +1125,7 @@
       settings.load();
     }
     attachEditors();
-    // VM template switches may replace the editor without navigating.
+    // VM template switches and Compose service tabs may replace fields without navigating.
     var pending = false;
     new MutationObserver(function (mutations) {
       if (pending || !mutations.some(function (entry) { return entry.addedNodes.length > 0; })) return;

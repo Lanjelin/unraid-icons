@@ -1,6 +1,6 @@
 # unraid-icons
 
-A shared icon library for Unraid VMs and Docker containers. Browse application logos and generic symbols, or import an image from a URL. Download an icon once and use it in either editor.
+A shared icon library for Unraid VMs and Docker containers, with optional Compose Manager Plus integration. Browse application logos and generic symbols, or import an image from a URL. Download an icon once and select it from supported editors.
 
 [GitHub repository](https://github.com/lanjelin/unraid-icons) · [Report an issue](https://github.com/lanjelin/unraid-icons/issues)
 
@@ -70,6 +70,19 @@ Only icons you explicitly download are saved. Browsing previews does not fill yo
 **Selecting an icon only changes the editor form.** Closing or canceling the editor without applying does not change the VM or container. Downloading from **Settings → Icons** adds to the shared library; it does not assign an icon to anything.
 
 The same saved icon can be used by multiple VMs and containers. The plugin does not apply editor changes, redefine VMs, or recreate containers on your behalf.
+
+### Compose Manager Plus (optional)
+
+If [Compose Manager Plus](https://github.com/mstrhakr/compose_plugin) is installed, **Choose icon…** also appears in its stack editor:
+
+- **Settings → Icon URL / Path** selects the stack icon.
+- **WebUI Labels → Icon URL / Path** selects an individual service's container icon.
+
+Choose a saved icon or download one, then select **Use icon** and use Compose Manager Plus's **Apply** button. Service-label changes may require recreating the affected containers; use Compose Manager Plus's normal workflow.
+
+Selections are embedded as PNG data URLs in Compose's settings or service labels, not linked to the library file. This avoids private-host and authenticated-URL restrictions. Saved copies remain usable if you delete the library original or uninstall unraid-icons, and do not count as library-file references. Changing an icon in the library does not update those copies; select it again to replace them. Large embedded images must fit Compose Manager Plus and web-server request-size limits.
+
+Compose Manager Plus is not required. Without it, the normal VM and Docker integrations work unchanged.
 
 ## Manage your library
 
@@ -148,6 +161,6 @@ Requires Node.js and GNU `tar`. Run from the repository root:
 node tools/build.mjs
 ```
 
-The build creates the self-contained `dist/unraid-icons.plg`. Before each release, update `version` in `tools/build.mjs` and add a matching version heading at the top of [CHANGELOG.md](CHANGELOG.md), with concise user-facing changes. Keep older entries below it.
+The build creates the self-contained `dist/unraid-icons.plg`. Its version comes from the first heading in [CHANGELOG.md](CHANGELOG.md), the single source of truth for release versions. Before each release, prepend a heading in the form `### YYYY.MM.DD`, optionally with a lowercase letter suffix such as `### 2026.10.21a`, followed by concise user-facing changes. Keep older entries below it. A missing or malformed first heading fails the build.
 
 The builder embeds the changelog in the plugin's `<CHANGES>` element so Unraid's plugin manager can display release notes. Do not edit the generated `.plg` by hand. Publish the rebuilt `dist/unraid-icons.plg` at the configured update URL.
